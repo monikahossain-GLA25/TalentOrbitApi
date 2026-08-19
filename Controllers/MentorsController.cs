@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TalentOrbitApi.Data;
+using TalentOrbitApi.Models.Dtos;
+using TalentOrbitApi.Models.Entities;
 
 namespace TalentOrbitApi.Controllers
 {
@@ -33,11 +35,28 @@ namespace TalentOrbitApi.Controllers
                 return NotFound();
 
             }
-            
-            return Ok(mentor);
-            
-        }
 
+            return Ok(mentor);
+
+        }
+        [HttpPost]
+        public IActionResult AddMentor(AddMentorDto addMentorDto)
+        {
+            var MentorEntity = new Mentor
+            {
+                Id = Guid.NewGuid(),
+                FullName = addMentorDto.FullName,
+                EmailAddress = addMentorDto.EmailAddress,
+                PhoneNumber = addMentorDto.PhoneNumber,
+                HourlyRate = addMentorDto.HourlyRate,
+
+            };
+            applicationDbContext.Mentors.Add(MentorEntity);
+            applicationDbContext.SaveChanges();
+
+            return Ok(MentorEntity);
+
+        }
    
         
     }
