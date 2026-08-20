@@ -36,9 +36,9 @@ PUT {{host}}/api/Mentors/{{mentorId}}
 Content-Type: application/json
 
 {
-  "fullName": "Ayesha Rahman Updated",
-  "emailAddress": "ayesha.updated@example.com",
-  "phoneNumber": "01800000000",
+  "fullName": "Monika Hossain Updated",
+  "emailAddress": "monikahossain25@gmail.com",
+  "phoneNumber": "01951337905",
   "hourlyRate": 1800
 }
 
