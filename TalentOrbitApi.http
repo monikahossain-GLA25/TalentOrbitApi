@@ -1,6 +1,54 @@
 @TalentOrbitApi_HostAddress = http://localhost:5225
 
-GET {{TalentOrbitApi_HostAddress}}/weatherforecast/
+# GET {{TalentOrbitApi_HostAddress}}/weatherforecast/
+# Accept: application/json
+
+@host = https://localhost:7078
+@mentorId = 6b25e711-955d-4f80-a75d-0a96883ebcb0
+### 1. Get all mentors
+
+GET {{host}}/api/Mentors
 Accept: application/json
 
-###
+
+### 2. Create a mentor
+
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "Monika Hossain",
+  "emailAddress": "monikahossain25@gmail.com",
+  "phoneNumber": "01951337905",
+  "hourlyRate": 1500
+}
+
+
+### 3. Get mentor by ID
+
+GET {{host}}/api/Mentors/{{mentorId}}
+Accept: application/json
+
+
+### 4. Update mentor
+
+PUT {{host}}/api/Mentors/{{mentorId}}
+Content-Type: application/json
+
+{
+  "fullName": "Ayesha Rahman Updated",
+  "emailAddress": "ayesha.updated@example.com",
+  "phoneNumber": "01800000000",
+  "hourlyRate": 1800
+}
+
+
+### 5. Delete mentor
+
+DELETE {{host}}/api/Mentors/{{mentorId}}
+
+
+### 6. Check deleted mentor
+
+GET {{host}}/api/Mentors/{{mentorId}}
+Accept: application/json
