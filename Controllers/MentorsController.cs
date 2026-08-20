@@ -57,7 +57,38 @@ namespace TalentOrbitApi.Controllers
             return Ok(MentorEntity);
 
         }
-   
-        
+        [HttpPut]
+        [Route("{id:guid}")]
+        public IActionResult UpdateMentor(Guid id , UpdateMnentorDto updateMnentorDto)
+        {
+
+           var mentor = applicationDbContext.Mentors.Find(id);
+            if(mentor == null)
+            {
+                return NotFound();
+            }
+           mentor.FullName = updateMnentorDto.FullName;
+            mentor.EmailAddress = updateMnentorDto.EmailAddress;
+            mentor.PhoneNumber = updateMnentorDto.PhoneNumber;
+            mentor.HourlyRate = updateMnentorDto.HourlyRate;
+            mentor.Id = id;
+            applicationDbContext.SaveChanges();
+            return Ok(mentor);
+
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public IActionResult DeleteMentor (Guid id)
+        {
+            var mentor = applicationDbContext.Mentors.Find(id);
+            if(mentor == null)
+            {
+                return NotFound();
+            }
+            applicationDbContext.Mentors.Remove(mentor);
+            applicationDbContext.SaveChanges();
+            return Ok();
+        }
     }
 }
