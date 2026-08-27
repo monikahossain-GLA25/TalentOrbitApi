@@ -59,7 +59,7 @@ namespace TalentOrbitApi.Controllers
         }
         [HttpPut]
         [Route("{id:guid}")]
-        public IActionResult UpdateMentor(Guid id , UpdateMnentorDto updateMnentorDto)
+        public IActionResult UpdateMentor(Guid id , UpdateMentorDto updateMnentorDto)
         {
 
            var mentor = applicationDbContext.Mentors.Find(id);
