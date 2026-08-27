@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TalentOrbitApi.Data;
 using TalentOrbitApi.Models.Dtos;
 using TalentOrbitApi.Models.Entities;
@@ -18,77 +19,24 @@ namespace TalentOrbitApi.Controllers
 
 
         [HttpGet]
-        public IActionResult GetAllMentors()
+        public async Task<ActionResult<List<MentorDto>>>
+    GetAllMentors()
         {
-            var allMentors = applicationDbContext.Mentors.ToList();
-            return Ok(allMentors);
+            var mentors = await applicationDbContext.Mentors
+                .AsNoTracking()
+                .Select(mentor => new MentorDto
+                {
+                    Id = mentor.Id,
+                    FullName = mentor.FullName,
+                    EmailAddress = mentor.EmailAddress,
+                    PhoneNumber = mentor.PhoneNumber,
+                    HourlyRate = mentor.HourlyRate
+                })
+                .ToListAsync();
+
+            return Ok(mentors);
         }
 
-        // GET: api/Mentors/{id}
-        [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetMentorById(Guid id)
-        {
-            var mentor = applicationDbContext.Mentors.Find(id);
-            if (mentor == null)
-            {
-                return NotFound();
 
-            }
-
-            return Ok(mentor);
-
-        }
-        [HttpPost]
-        public IActionResult AddMentor(AddMentorDto addMentorDto)
-        {
-            var MentorEntity = new Mentor
-            {
-                Id = Guid.NewGuid(),
-                FullName = addMentorDto.FullName,
-                EmailAddress = addMentorDto.EmailAddress,
-                PhoneNumber = addMentorDto.PhoneNumber,
-                HourlyRate = addMentorDto.HourlyRate,
-
-            };
-            applicationDbContext.Mentors.Add(MentorEntity);
-            applicationDbContext.SaveChanges();
-
-            return Ok(MentorEntity);
-
-        }
-        [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdateMentor(Guid id , UpdateMentorDto updateMnentorDto)
-        {
-
-           var mentor = applicationDbContext.Mentors.Find(id);
-            if(mentor == null)
-            {
-                return NotFound();
-            }
-           mentor.FullName = updateMnentorDto.FullName;
-            mentor.EmailAddress = updateMnentorDto.EmailAddress;
-            mentor.PhoneNumber = updateMnentorDto.PhoneNumber;
-            mentor.HourlyRate = updateMnentorDto.HourlyRate;
-            mentor.Id = id;
-            applicationDbContext.SaveChanges();
-            return Ok(mentor);
-
-        }
-
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public IActionResult DeleteMentor (Guid id)
-        {
-            var mentor = applicationDbContext.Mentors.Find(id);
-            if(mentor == null)
-            {
-                return NotFound();
-            }
-            applicationDbContext.Mentors.Remove(mentor);
-            applicationDbContext.SaveChanges();
-            return Ok();
-        }
     }
 }
