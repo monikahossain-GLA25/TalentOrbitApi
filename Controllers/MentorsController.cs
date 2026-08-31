@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using TalentOrbitApi.Data;
 using TalentOrbitApi.Models.Dtos;
 using TalentOrbitApi.Models.Entities;
@@ -104,7 +105,7 @@ namespace TalentOrbitApi.Controllers
 
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<MentorDto>>GetentorById(Guid id)
+        public async Task<ActionResult<MentorDto>>GetMentorById(Guid id)
         {
             var mentor = await applicationDbContext.Mentors.AsNoTracking().Where(mentor => mentor.Id ==id).Select(mentor => new MentorDto
             {
@@ -127,5 +128,36 @@ namespace TalentOrbitApi.Controllers
             return Ok(mentor);
         }
 
+        [HttpPost]
+        public async Task <ActionResult<MentorDto>>AddMentor(AddMentorDto addMentorDto)
+        {
+            var mentorEntity = new Mentor
+            {
+                Id = Guid.NewGuid(),
+                FullName = addMentorDto.FullName,
+                EmailAddress = addMentorDto.EmailAddress,
+                PhoneNumber = addMentorDto.PhoneNumber,
+                HourlyRate = addMentorDto.HourlyRate
+
+            };
+            await applicationDbContext.Mentors.AddAsync(mentorEntity);
+            await applicationDbContext.SaveChangesAsync();
+            return CreatedAtAction(
+                nameof(GetMentorById),
+                new { id = mentorEntity.Id },
+                MapToDto(mentorEntity));
+
+        }
+        private static MentorDto MapToDto(Mentor mentor)
+        {
+            return new MentorDto
+            {
+                Id = mentor.Id,
+                FullName = mentor.FullName,
+                EmailAddress = mentor.EmailAddress,
+                PhoneNumber = mentor.PhoneNumber,
+                HourlyRate = mentor.HourlyRate
+            };
+        }
     }
 }
