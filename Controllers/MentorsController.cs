@@ -166,20 +166,45 @@ namespace TalentOrbitApi.Controllers
             await applicationDbContext.SaveChangesAsync();
             return Ok(MapToDto(mentor));
         }
+       
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<MentorDto>> DeleteMentor(Guid id)
+        public async Task<IActionResult>
+    DeleteMentor([FromRoute] Guid id)
         {
-            var mentorDelete = await applicationDbContext.Mentors.FindAsync(id);
-            if (mentorDelete == null)
+            var mentor = await applicationDbContext.Mentors
+                .FindAsync(id);
+
+            if (mentor is null)
             {
                 return NotFound(new
                 {
-                    message = $"Mentor with ID {id} not found."
+                    message = $"Mentor with ID {id} was not found."
                 });
-               
             }
 
-             applicationDbContext.Mentors.Remove(mentorDelete);
+            applicationDbContext.Mentors.Remove(mentor);
+
+            await applicationDbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult>
+    DeleteMentor([FromRoute] Guid id)
+        {
+            var mentor = await applicationDbContext.Mentors
+                .FindAsync(id);
+
+            if (mentor is null)
+            {
+                return NotFound(new
+                {
+                    message = $"Mentor with ID {id} was not found."
+                });
+            }
+
+            applicationDbContext.Mentors.Remove(mentor);
+
             await applicationDbContext.SaveChangesAsync();
 
             return NoContent();
