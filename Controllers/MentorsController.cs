@@ -16,26 +16,6 @@ namespace TalentOrbitApi.Controllers
         public MentorsController(ApplicationDbContext applicationDbContext) {
             this.applicationDbContext = applicationDbContext;
         }
-
-
-        [HttpGet]
-        public async Task<ActionResult<List<MentorDto>>> GetAllMentors()
-        {
-            var mentors = await applicationDbContext.Mentors
-                .AsNoTracking()
-                .Select(mentor => new MentorDto
-                {
-                    Id = mentor.Id,
-                    FullName = mentor.FullName,
-                    EmailAddress = mentor.EmailAddress,
-                    PhoneNumber = mentor.PhoneNumber,
-                    HourlyRate = mentor.HourlyRate
-                })
-                .ToListAsync();
-
-            return Ok(mentors);
-        }
-        [HttpPost]
         [HttpGet]
         public async Task<ActionResult<List<MentorDto>>>
     GetAllMentors(
