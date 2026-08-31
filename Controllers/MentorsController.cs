@@ -148,6 +148,24 @@ namespace TalentOrbitApi.Controllers
                 MapToDto(mentorEntity));
 
         }
+        [HttpPut]
+        public async Task <ActionResult<MentorDto>>UpdateMentor(Guid id ,UpdateMentorDto updateMentorDto) {
+                
+        var mentor = await applicationDbContext.Mentors.FindAsync(id);
+            if(mentor == null)   {
+                return NotFound(new
+                {
+                    message = $"Mentor with ID {id} not found."
+                });
+            }
+            mentor.FullName = updateMentorDto.FullName.Trim();
+            mentor.EmailAddress = updateMentorDto.EmailAddress.Trim();
+            mentor.PhoneNumber = updateMentorDto.PhoneNumber?.Trim();
+            mentor.HourlyRate = updateMentorDto.HourlyRate;
+
+            await applicationDbContext.SaveChangesAsync();
+            return Ok(MapToDto(mentor));
+        }
         private static MentorDto MapToDto(Mentor mentor)
         {
             return new MentorDto
