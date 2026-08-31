@@ -16,12 +16,13 @@ namespace TalentOrbitApi.Controllers
         public MentorsController(ApplicationDbContext applicationDbContext) {
             this.applicationDbContext = applicationDbContext;
         }
+
         [HttpGet]
-        public async Task<ActionResult<List<MentorDto>>>
-    GetAllMentors(
+        public async Task<ActionResult<List<MentorDto>>> GetAllMentors(
         [FromQuery] string? search,
         [FromQuery] string sortBy = "fullName",
         [FromQuery] string sortDirection = "asc")
+
         {
             var normalizedSortBy =
                 sortBy.Trim().ToLowerInvariant();
@@ -100,5 +101,31 @@ namespace TalentOrbitApi.Controllers
 
             return Ok(mentors);
         }
+
+
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<MentorDto>>GetentorById(Guid id)
+        {
+            var mentor = await applicationDbContext.Mentors.AsNoTracking().Where(mentor => mentor.Id ==id).Select(mentor => new MentorDto
+            {
+                Id = mentor.Id,
+                FullName = mentor.FullName,
+                EmailAddress = mentor.EmailAddress,
+                PhoneNumber = mentor.PhoneNumber,
+                HourlyRate = mentor.HourlyRate
+            }).FirstOrDefaultAsync();
+
+            if(mentor == null)
+            {
+                return NotFound(new
+                {
+                    message = $"Mentor with ID {id} not found."
+                });
+
+
+            }
+            return Ok(mentor);
+        }
+
     }
 }
