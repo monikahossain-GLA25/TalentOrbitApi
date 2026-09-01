@@ -128,28 +128,45 @@ namespace TalentOrbitApi.Controllers
             return Ok(mentor);
         }
 
+     
         [HttpPost]
-        public async Task <ActionResult<MentorDto>>AddMentor(AddMentorDto addMentorDto)
+        public async Task<ActionResult<MentorDto>>
+    AddMentor(
+        [FromBody] AddMentorDto addMentorDto,
+        [FromHeader(Name = "X-Correlation-ID")]
+        string? correlationId)
         {
+            if (!string.IsNullOrWhiteSpace(correlationId))
+            {
+                Response.Headers["X-Correlation-ID"] =
+                    correlationId;
+            }
+
             var mentorEntity = new Mentor
             {
                 Id = Guid.NewGuid(),
-                FullName = addMentorDto.FullName,
-                EmailAddress = addMentorDto.EmailAddress,
-                PhoneNumber = addMentorDto.PhoneNumber,
+                FullName = addMentorDto.FullName.Trim(),
+                EmailAddress = addMentorDto.EmailAddress.Trim(),
+                PhoneNumber = addMentorDto.PhoneNumber?.Trim(),
                 HourlyRate = addMentorDto.HourlyRate
-
             };
-            await applicationDbContext.Mentors.AddAsync(mentorEntity);
+
+            await applicationDbContext.Mentors
+                .AddAsync(mentorEntity);
+
             await applicationDbContext.SaveChangesAsync();
+
             return CreatedAtAction(
                 nameof(GetMentorById),
                 new { id = mentorEntity.Id },
                 MapToDto(mentorEntity));
-
         }
         [HttpPut("{id:guid}")]
-        public async Task <ActionResult<MentorDto>>UpdateMentor(Guid id ,UpdateMentorDto updateMentorDto) {
+        public async Task<ActionResult<MentorDto>>
+    UpdateMentor(
+        [FromRoute] Guid id,
+        [FromBody] UpdateMentorDto updateMentorDto)
+        {
                 
         var mentor = await applicationDbContext.Mentors.FindAsync(id);
             if(mentor == null)   {
@@ -168,8 +185,8 @@ namespace TalentOrbitApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult>
-     DeleteMentor([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteMentor([FromRoute] Guid id)
+
         {
             var mentor = await applicationDbContext.Mentors
                 .FindAsync(id);
