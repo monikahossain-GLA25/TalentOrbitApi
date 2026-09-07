@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
+
 using TalentOrbitApi.Data;
 using TalentOrbitApi.Models.Dtos;
 using TalentOrbitApi.Models.Entities;
@@ -185,8 +185,8 @@ namespace TalentOrbitApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteMentor([FromRoute] Guid id)
-
+        public async Task<IActionResult>
+    DeleteMentor([FromRoute] Guid id)
         {
             var mentor = await applicationDbContext.Mentors
                 .FindAsync(id);
