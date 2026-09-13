@@ -105,31 +105,35 @@ namespace TalentOrbitApi.Controllers
 
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<MentorDto>>GetMentorById(Guid id)
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<MentorDto>> GetMentorById(
+    [FromRoute] Guid id)
         {
-            var mentor = await applicationDbContext.Mentors.AsNoTracking().Where(mentor => mentor.Id ==id).Select(mentor => new MentorDto
-            {
-                Id = mentor.Id,
-                FullName = mentor.FullName,
-                EmailAddress = mentor.EmailAddress,
-                PhoneNumber = mentor.PhoneNumber,
-                HourlyRate = mentor.HourlyRate
-            }).FirstOrDefaultAsync();
+            var mentor = await applicationDbContext.Mentors
+                .AsNoTracking()
+                .Where(mentor => mentor.Id == id)
+                .Select(mentor => new MentorDto
+                {
+                    Id = mentor.Id,
+                    FullName = mentor.FullName,
+                    EmailAddress = mentor.EmailAddress,
+                    PhoneNumber = mentor.PhoneNumber,
+                    HourlyRate = mentor.HourlyRate
+                })
+                .FirstOrDefaultAsync();
 
-            if(mentor == null)
+            if (mentor is null)
             {
                 return NotFound(new
                 {
                     message = $"Mentor with ID {id} not found."
                 });
-
-
             }
+
             return Ok(mentor);
         }
 
 
-       
         [HttpPost]
         public async Task<ActionResult<MentorDto>>
     AddMentor(
