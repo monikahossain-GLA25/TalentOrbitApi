@@ -128,7 +128,7 @@ namespace TalentOrbitApi.Controllers
             return Ok(mentor);
         }
 
-     
+
         [HttpPost]
         public async Task<ActionResult<MentorDto>>
     AddMentor(
@@ -184,6 +184,7 @@ namespace TalentOrbitApi.Controllers
             return Ok(MapToDto(mentor));
         }
 
+
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult>
     DeleteMentor([FromRoute] Guid id)
@@ -205,6 +206,7 @@ namespace TalentOrbitApi.Controllers
 
             return NoContent();
         }
+
         private static MentorDto MapToDto(Mentor mentor)
         {
             return new MentorDto
