@@ -104,8 +104,9 @@ namespace TalentOrbitApi.Controllers
         }
 
 
+
         [HttpGet("{id:guid}")]
-        [HttpGet("{id:guid}")]
+       
         public async Task<ActionResult<MentorDto>> GetMentorById(
     [FromRoute] Guid id)
         {
@@ -132,7 +133,6 @@ namespace TalentOrbitApi.Controllers
 
             return Ok(mentor);
         }
-
 
         [HttpPost]
         public async Task<ActionResult<MentorDto>>
