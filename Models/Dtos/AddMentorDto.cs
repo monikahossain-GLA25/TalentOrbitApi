@@ -5,9 +5,7 @@ namespace TalentOrbitApi.Models.Dtos
     public class AddMentorDto
     {
         [Required(ErrorMessage = "Full name is required.")]
-        [MaxLength(
-            100,
-            ErrorMessage = "Full name cannot exceed 100 characters.")]
+        [MaxLength(100, ErrorMessage = "Full name cannot exceed 100 characters.")]
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email address is required.")]

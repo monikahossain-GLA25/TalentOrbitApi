@@ -19,37 +19,67 @@ namespace TalentOrbitApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<MentorDto>>> GetAllMentors(
-        [FromQuery] string? search,
-        [FromQuery] string sortBy = "fullName",
-        [FromQuery] string sortDirection = "asc")
-
+        public async Task<ActionResult<PagedResult<MentorDto>>> GetAllMentors(
+            [FromQuery] string? search,
+            [FromQuery] string? sortBy = "fullName",
+            [FromQuery] string? sortDirection = "asc",
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            CancellationToken cancellationToken = default)
         {
+            // 1. Validate pagination inputs.
+            if (pageNumber < 1)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid page number",
+                    detail: "Page number must be at least 1.");
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid page size",
+                    detail: "Page size must be between 1 and 100.");
+            }
+
+            // Calculate using long to avoid integer overflow.
+            var offset = ((long)pageNumber - 1) * pageSize;
+
+            if (offset > int.MaxValue)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Page number is too large",
+                    detail: "The requested page exceeds the supported offset.");
+            }
+
+            // 2. Normalize and validate sorting inputs.
             var normalizedSortBy =
-                sortBy.Trim().ToLowerInvariant();
+                (sortBy ?? "fullName").Trim().ToLowerInvariant();
 
             var normalizedDirection =
-                sortDirection.Trim().ToLowerInvariant();
+                (sortDirection ?? "asc").Trim().ToLowerInvariant();
 
             if (normalizedSortBy is not
                 ("fullname" or "emailaddress" or "hourlyrate"))
             {
-                return BadRequest(new
-                {
-                    message =
-                        "Sort by must be fullName, emailAddress, or hourlyRate."
-                });
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid sort field",
+                    detail: "Sort by must be fullName, emailAddress, or hourlyRate.");
             }
 
             if (normalizedDirection is not ("asc" or "desc"))
             {
-                return BadRequest(new
-                {
-                    message =
-                        "Sort direction must be either 'asc' or 'desc'."
-                });
+                return Problem(
+                    statusCode: StatusCodes.Status400BadRequest,
+                    title: "Invalid sort direction",
+                    detail: "Sort direction must be asc or desc.");
             }
 
+            // 3. Build the query without loading all records.
             IQueryable<Mentor> query =
                 applicationDbContext.Mentors.AsNoTracking();
 
@@ -66,30 +96,33 @@ namespace TalentOrbitApi.Controllers
                     ));
             }
 
+            // 4. Count all matching records before applying pagination.
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            // 5. Apply the selected sorting.
             var descending = normalizedDirection == "desc";
 
-            query = normalizedSortBy switch
-            {
-                "emailaddress" => descending
-                    ? query.OrderByDescending(mentor =>
-                        mentor.EmailAddress)
-                    : query.OrderBy(mentor =>
-                        mentor.EmailAddress),
+            IOrderedQueryable<Mentor> orderedQuery =
+                normalizedSortBy switch
+                {
+                    "emailaddress" => descending
+                        ? query.OrderByDescending(mentor => mentor.EmailAddress)
+                        : query.OrderBy(mentor => mentor.EmailAddress),
 
-                "hourlyrate" => descending
-                    ? query.OrderByDescending(mentor =>
-                        mentor.HourlyRate)
-                    : query.OrderBy(mentor =>
-                        mentor.HourlyRate),
+                    "hourlyrate" => descending
+                        ? query.OrderByDescending(mentor => mentor.HourlyRate)
+                        : query.OrderBy(mentor => mentor.HourlyRate),
 
-                _ => descending
-                    ? query.OrderByDescending(mentor =>
-                        mentor.FullName)
-                    : query.OrderBy(mentor =>
-                        mentor.FullName)
-            };
+                    _ => descending
+                        ? query.OrderByDescending(mentor => mentor.FullName)
+                        : query.OrderBy(mentor => mentor.FullName)
+                };
 
-            var mentors = await query
+            // 6. Fetch only the requested page.
+            var items = await orderedQuery
+                .ThenBy(mentor => mentor.Id)
+                .Skip((int)offset)
+                .Take(pageSize)
                 .Select(mentor => new MentorDto
                 {
                     Id = mentor.Id,
@@ -98,11 +131,21 @@ namespace TalentOrbitApi.Controllers
                     PhoneNumber = mentor.PhoneNumber,
                     HourlyRate = mentor.HourlyRate
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            return Ok(mentors);
+            // 7. Return the items and pagination information.
+            var result = new PagedResult<MentorDto>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(
+                    totalCount / (double)pageSize)
+            };
+
+            return Ok(result);
         }
-
 
 
         [HttpGet("{id:guid}")]
