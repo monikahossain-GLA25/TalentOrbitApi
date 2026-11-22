@@ -17,19 +17,61 @@ POST {{host}}/api/Mentors
 Content-Type: application/json
 
 {
-  "fullName": "Monika Hossain",
-  "emailAddress": "monikahossain25@gmail.com",
-  "phoneNumber": "01951337905",
-  "hourlyRate": 1500
+  "fullName": "Rahman Ahmed",
+  "emailAddress": "rahman@example23ration.com",
+  "phoneNumber": "01712345678",
+  "hourlyRate": 1000
 }
 
+### Mentor 2
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "Karim Hasan",
+  "emailAddress": "karim@example.com",
+  "phoneNumber": "01712345679",
+  "hourlyRate": 1200
+}
+### Mentor 3
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "Nusrat Jahan",
+  "emailAddress": "nusrat@example.com",
+  "phoneNumber": "01812345678",
+  "hourlyRate": 1500
+}
+### Mentor 4
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "Sabbir Ahmed",
+  "emailAddress": "sabbir@example.com",
+  "phoneNumber": "01912345678",
+  "hourlyRate": 1000
+}
+### Mentor 5
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "Farhana Islam",
+  "emailAddress": "farhana@example.com",
+  "phoneNumber": "01612345678",
+  "hourlyRate": 2000
+}
 
 ### 3. Get mentor by ID
 
 GET {{host}}/api/Mentors/{{mentorId}}
 Accept: application/json
 
-
+### Pagination test
+GET {{host}}/api/Mentors?pageNumber=1&pageSize=2
+Accept: application/json
 ### 4. Update mentor
 
 PUT {{host}}/api/Mentors/{{mentorId}}
@@ -41,7 +83,31 @@ Content-Type: application/json
   "phoneNumber": "01951337905",
   "hourlyRate": 1800
 }
+### Search by name
+GET {{host}}/api/Mentors?search=Karim
 
+### Search by email
+GET {{host}}/api/Mentors?search=example.com
+
+### Search by phone
+GET {{host}}/api/Mentors?search=017
+
+
+
+### Sort by hourly rate — Ascending
+GET {{host}}/api/Mentors?sortBy=hourlyRate&sortDirection=asc
+
+### Sort by hourly rate — Descending
+GET {{host}}/api/Mentors?sortBy=hourlyRate&sortDirection=desc
+
+### Invalid sorting field
+GET {{host}}/api/Mentors?sortBy=invalidField
+
+### Invalid page number
+GET {{host}}/api/Mentors?pageNumber=0
+
+### Unknown endpoint
+GET {{host}}/api/unknown-endpoint
 
 ### 5. Delete mentor
 
@@ -52,3 +118,20 @@ DELETE {{host}}/api/Mentors/{{mentorId}}
 
 GET {{host}}/api/Mentors/{{mentorId}}
 Accept: application/json
+
+### 7. Test global 404 Problem Details
+
+GET {{host}}/api/unknown-endpoint
+Accept: application/problem+json
+
+### Validation test - invalid mentor
+
+POST {{host}}/api/Mentors
+Content-Type: application/json
+
+{
+  "fullName": "",
+  "emailAddress": "not-an-email",
+  "phoneNumber": "abc",
+  "hourlyRate": 0
+}
