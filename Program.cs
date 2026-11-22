@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TalentOrbitApi.Data;
+using TalentOrbitApi.Services;
+using TalentOrbitApi.Services.Interfaces;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +30,7 @@ var connectionString = builder.Configuration
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-
+builder.Services.AddScoped<IMentorService, MentorService>();
 var app = builder.Build();
 
 

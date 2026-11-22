@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using TalentOrbitApi.Data;
 using TalentOrbitApi.Models.Dtos;
 using TalentOrbitApi.Models.Entities;
+using TalentOrbitApi.Services.Interfaces;
 
 namespace TalentOrbitApi.Controllers
 {
@@ -12,12 +13,16 @@ namespace TalentOrbitApi.Controllers
     [ApiController]
     public class MentorsController : ControllerBase
     {
-        private readonly ApplicationDbContext applicationDbContext;
+        private readonly ApplicationDbContext _context;
+        private readonly IMentorService _mentorService;
 
-        public MentorsController(ApplicationDbContext applicationDbContext) {
-            this.applicationDbContext = applicationDbContext;
+        public MentorsController(
+            ApplicationDbContext context,
+            IMentorService mentorService)
+        {
+            _context = context;
+            _mentorService = mentorService;
         }
-
         [HttpGet]
         public async Task<ActionResult<PagedResult<MentorDto>>> GetAllMentors(
             [FromQuery] string? search,
