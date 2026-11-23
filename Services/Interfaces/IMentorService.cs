@@ -5,6 +5,9 @@ namespace TalentOrbitApi.Services.Interfaces
 {
     public interface IMentorService
     {
+        Task<MentorDto?> GetByIdAsync(
+    Guid id,
+    CancellationToken cancellationToken = default);
         Task<PagedResult<MentorDto>> GetAllAsync(
             int pageNumber,
             int pageSize,

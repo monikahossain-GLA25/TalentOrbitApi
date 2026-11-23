@@ -23,6 +23,9 @@ namespace TalentOrbitApi.Services
             string? sortBy,
             string? sortDirection,
             CancellationToken cancellationToken = default)
+
+
+
         {
             // Step 1: Start with a read-only query.
             IQueryable<Mentor> query =
@@ -88,6 +91,25 @@ namespace TalentOrbitApi.Services
                 TotalPages = (int)Math.Ceiling(
                     totalCount / (double)pageSize)
             };
+
+        }
+
+        public async Task<MentorDto?> GetByIdAsync(
+    Guid id,
+    CancellationToken cancellationToken = default)
+        {
+            return await _context.Mentors
+                .AsNoTracking()
+                .Where(m => m.Id == id)
+                .Select(m => new MentorDto
+                {
+                    Id = m.Id,
+                    FullName = m.FullName,
+                    EmailAddress = m.EmailAddress,
+                    PhoneNumber = m.PhoneNumber,
+                    HourlyRate = m.HourlyRate
+                })
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }
